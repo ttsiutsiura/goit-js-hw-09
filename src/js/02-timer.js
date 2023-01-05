@@ -15,32 +15,55 @@ const options = {
   defaultDate: new Date(),
   minuteIncrement: 1,
   onClose(selectedDates) {
-    const isSelectedDateValid =
+    const isSelectedDatesValid =
       selectedDates[0].getTime() >= options.defaultDate.getTime();
 
-    if (!isSelectedDateValid) {
+    const isHasDisabledAttribute = startBtnEl.hasAttribute('disabled');
+
+    if (!isSelectedDatesValid) {
       Notify.failure('Please choose a date in the future');
+      setDisabledAttribute(startBtnEl);
       return;
     }
 
-    startBtnEl.removeAttribute('disabled');
+    removeDisabledAttribute(startBtnEl);
   },
 };
 
 const fp = flatpickr('input#datetime-picker', options);
 
 function onStartBtnClick() {
-  setInterval(() => {
+  const intervalId = setInterval(() => {
     const currentDate = new Date();
     const { days, hours, minutes, seconds } = convertMs(
       fp.selectedDates[0].getTime() - currentDate.getTime()
     );
 
-    daysOutputEl.textContent = addLeadingZero(days);
-    hoursOutputEl.textContent = addLeadingZero(hours);
-    minutesOutputEl.textContent = addLeadingZero(minutes);
-    secondsOutputEl.textContent = addLeadingZero(seconds);
+    const isTimeOver =
+      days === 0 && hours === 0 && minutes === 0 && seconds === 0;
+
+    renderTimeLeft({ days, hours, minutes, seconds });
+
+    if (isTimeOver) {
+      clearInterval(intervalId);
+      return;
+    }
   }, 1000);
+}
+
+function setDisabledAttribute(el) {
+  el.setAttribute('disabled', 'true');
+}
+
+function removeDisabledAttribute(el) {
+  el.removeAttribute('disabled');
+}
+
+function renderTimeLeft(time) {
+  daysOutputEl.textContent = addLeadingZero(time.days);
+  hoursOutputEl.textContent = addLeadingZero(time.hours);
+  minutesOutputEl.textContent = addLeadingZero(time.minutes);
+  secondsOutputEl.textContent = addLeadingZero(time.seconds);
 }
 
 function convertMs(ms) {
