@@ -22,6 +22,7 @@ function onFormSubmit(event) {
       });
     delayCounter += Number(stepInputEl.value);
   }
+  formEl.reset();
 }
 
 function createPromise(position, delay) {
@@ -37,4 +38,3 @@ function createPromise(position, delay) {
     }, delay);
   });
 }
-
